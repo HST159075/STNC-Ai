@@ -2,11 +2,11 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { 
   User, Calendar, Globe, Phone, 
   Briefcase, Sparkles, CheckCircle2, 
-  ArrowRight, Loader2, Zap 
+  ArrowRight, Loader2, Zap, PartyPopper, LayoutDashboard
 } from "lucide-react";
 import { useSession } from "@/lib/auth-client";
 import Navbar from "@/components/layout/Navbar";
@@ -27,6 +27,8 @@ export default function FreelancerOnboarding() {
   });
   const [skillInput, setSkillInput] = useState("");
   const [loading, setLoading] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
+  const [error, setError] = useState("");
 
   const addSkill = () => {
     if (skillInput.trim() && formData.skills.length < 10) {
@@ -62,18 +64,79 @@ export default function FreelancerOnboarding() {
       const data = await response.json();
 
       if (data.success) {
-        alert("Your application has been submitted! Our admins will review it shortly.");
-        router.push("/dashboard");
+        setSubmitted(true);
       } else {
-        alert("Error: " + data.error);
+        setError(data.error || "Something went wrong. Please try again.");
       }
-    } catch (error) {
-      console.error("Onboarding error:", error);
-      alert("Failed to finalize onboarding. Please try again.");
+    } catch (err) {
+      console.error("Onboarding error:", err);
+      setError("Failed to submit application. Please check your connection.");
     } finally {
       setLoading(false);
     }
   };
+
+  if (submitted) {
+    return (
+      <div className="min-h-screen bg-bg-main flex items-center justify-center px-6">
+        <Navbar />
+        <motion.div
+          initial={{ opacity: 0, scale: 0.8, y: 40 }}
+          animate={{ opacity: 1, scale: 1, y: 0 }}
+          transition={{ type: "spring", stiffness: 200, damping: 20 }}
+          className="w-full max-w-lg text-center"
+        >
+          {/* Animated Icon */}
+          <motion.div
+            initial={{ scale: 0 }}
+            animate={{ scale: 1 }}
+            transition={{ delay: 0.2, type: "spring", stiffness: 300 }}
+            className="w-32 h-32 bg-emerald-500/10 border-4 border-emerald-500/20 rounded-[3rem] flex items-center justify-center mx-auto mb-10 shadow-2xl shadow-emerald-500/10"
+          >
+            <CheckCircle2 size={64} className="text-emerald-500" />
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3 }}
+          >
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-500/10 text-emerald-500 text-[10px] font-black uppercase tracking-widest mb-6">
+              <PartyPopper size={12} /> Application Received
+            </div>
+            <h1 className="text-5xl font-black tracking-tight mb-6">
+              You&apos;re In The <span className="text-emerald-500">Queue!</span>
+            </h1>
+            <p className="text-text-muted font-medium text-lg leading-relaxed mb-12 max-w-md mx-auto">
+              Your freelancer application has been submitted successfully. Our admin team will review your profile and get back to you shortly.
+            </p>
+
+            <div className="grid grid-cols-3 gap-4 mb-12">
+              {[
+                { label: "Status", value: "Under Review", color: "text-amber-500" },
+                { label: "Response Time", value: "24-48 hrs", color: "text-primary" },
+                { label: "Skills Added", value: `${formData.skills.length}`, color: "text-emerald-500" },
+              ].map((item) => (
+                <div key={item.label} className="bg-bg-card border border-border rounded-[2rem] p-6">
+                  <p className={`text-xl font-black ${item.color}`}>{item.value}</p>
+                  <p className="text-[10px] font-black text-text-muted uppercase tracking-widest mt-1">{item.label}</p>
+                </div>
+              ))}
+            </div>
+
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={() => router.push("/dashboard")}
+              className="w-full py-6 bg-primary text-white rounded-[2rem] font-black text-sm uppercase tracking-widest flex items-center justify-center gap-3 shadow-2xl shadow-primary/20"
+            >
+              <LayoutDashboard size={20} /> Go to Dashboard
+            </motion.button>
+          </motion.div>
+        </motion.div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-bg-main">
@@ -182,6 +245,17 @@ export default function FreelancerOnboarding() {
                   ))}
                </div>
             </div>
+
+            {error && (
+              <motion.div
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="p-5 rounded-2xl bg-red-500/10 border border-red-500/20 text-red-500 text-sm font-bold flex items-center gap-3"
+              >
+                <span className="w-6 h-6 rounded-full bg-red-500/20 flex items-center justify-center text-xs shrink-0">!</span>
+                {error}
+              </motion.div>
+            )}
 
             <button 
               disabled={loading}
