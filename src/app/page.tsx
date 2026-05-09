@@ -339,7 +339,7 @@ export default function HomePage() {
                     <h2 className="text-5xl font-black mb-4 tracking-tighter">Architectural <span className="text-gradient">Insights</span></h2>
                     <p className="text-text-muted font-medium max-w-md italic">Expert strategies from the world's top 3% of tech talent.</p>
                  </div>
-                 <Link href="/blogs" className="group flex items-center gap-4 text-xs font-black uppercase tracking-widest text-primary">
+                 <Link href="/blog" className="group flex items-center gap-4 text-xs font-black uppercase tracking-widest text-primary">
                     Explore all articles <div className="w-10 h-10 rounded-full border border-primary/20 flex items-center justify-center group-hover:bg-primary group-hover:text-white transition-all"><ArrowRight size={16} /></div>
                  </Link>
               </div>
