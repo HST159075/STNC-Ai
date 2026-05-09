@@ -5,7 +5,7 @@ import { useParams, useRouter } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import apiClient from "@/lib/axios";
 import Navbar from "@/components/layout/Navbar";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { 
   Star, MapPin, Globe, Code, 
   Briefcase, CheckCircle2, Zap, 
