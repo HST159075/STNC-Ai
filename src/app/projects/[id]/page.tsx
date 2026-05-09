@@ -325,7 +325,30 @@ export default function ProjectDetailPage() {
                      <p className="text-sm text-text-muted font-medium leading-relaxed mb-10 line-clamp-3 italic">
                         "{bid.coverLetter}"
                      </p>
-                     <div className="flex gap-3">
+                      <div className="flex gap-3">
+                        {session?.user?.id === project?.clientId && (
+                           <button 
+                             onClick={async () => {
+                               try {
+                                 const res = await apiClient.post("/contracts", {
+                                   agreedAmount: bid.amount,
+                                   projectId: project.id,
+                                   freelancerId: bid.freelancerId,
+                                   clientId: session?.user?.id
+                                 });
+                                 if (res.data.success) {
+                                   queryClient.invalidateQueries({ queryKey: ['project', id] });
+                                   alert("Strategic partnership established!");
+                                 }
+                               } catch (error) {
+                                 alert("Failed to establish contract.");
+                               }
+                             }}
+                             className="flex-1 py-4 bg-emerald-500 text-slate-950 rounded-2xl font-black text-xs uppercase tracking-widest flex items-center justify-center gap-2 hover:bg-emerald-400 transition-all shadow-xl shadow-emerald-500/20"
+                           >
+                              <ShieldCheck size={14} /> Hire Architect
+                           </button>
+                        )}
                         <button 
                           onClick={() => handleContact(bid.freelancerId)}
                           className="flex-1 py-4 bg-primary text-white rounded-2xl font-black text-xs uppercase tracking-widest flex items-center justify-center gap-2 hover:shadow-xl hover:shadow-primary/20 transition-all"
