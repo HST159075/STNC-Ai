@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useParams } from 'next/navigation';
 import Navbar from '@/components/layout/Navbar';
 import { projectService } from '@/services/projectService';
 import { aiService } from '@/services/aiService';
@@ -14,14 +14,18 @@ import {
   ArrowLeft, ArrowRight, Zap, Bot,
   Cpu, Target, ShieldCheck, Globe,
   Terminal, Layers, ChevronRight,
-  Image as ImageIcon, Upload, X
+  Image as ImageIcon, Upload, X, Save
 } from 'lucide-react';
 
-const CreateProjectPage = () => {
+const EditProjectPage = () => {
   const { data: session } = useSession();
   const router = useRouter();
+  const params = useParams();
+  const projectId = params.projectId as string;
+  
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
+  const [fetching, setFetching] = useState(true);
   const [error, setError] = useState('');
   const [isMounted, setIsMounted] = useState(false);
 
@@ -40,7 +44,32 @@ const CreateProjectPage = () => {
 
   useEffect(() => {
     setIsMounted(true);
-  }, []);
+    fetchProject();
+  }, [projectId]);
+
+  const fetchProject = async () => {
+    try {
+      const res = await projectService.getProjectById(projectId);
+      if (res.success) {
+        const project = res.project;
+        setFormData({
+          title: project.title,
+          description: project.description,
+          budgetMin: project.budgetMin,
+          budgetMax: project.budgetMax,
+          tags: project.tags.join(', '),
+          category: project.category,
+          imageUrl: project.imageUrl || ''
+        });
+        if (project.imageUrl) setImagePreview(project.imageUrl);
+      }
+    } catch (err) {
+      console.error("Fetch error:", err);
+      setError("Failed to load project data");
+    } finally {
+      setFetching(false);
+    }
+  };
 
   const handleAIGenerate = async () => {
     if (!formData.title) return alert("Please enter a title first!");
@@ -102,22 +131,27 @@ const CreateProjectPage = () => {
     setError('');
 
     try {
-      const response = await projectService.createProject({
+      const response = await projectService.updateProject(projectId, {
         ...formData,
         tags: formData.tags.split(',').map(tag => tag.trim()),
       });
 
       if (response.success) {
-        router.push(`/projects/${response.project.id}`);
+        router.push(`/projects/${projectId}`);
       }
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Failed to create project');
+      setError(err.response?.data?.message || 'Failed to update project');
     } finally {
       setLoading(false);
     }
   };
 
   if (!isMounted) return null;
+  if (fetching) return (
+    <div className="min-h-screen bg-bg-main flex items-center justify-center">
+       <div className="w-10 h-10 border-4 border-primary border-t-transparent rounded-full animate-spin" />
+    </div>
+  );
 
   return (
     <main className="min-h-screen bg-bg-main pt-32 pb-20 relative overflow-hidden">
@@ -133,11 +167,11 @@ const CreateProjectPage = () => {
           <div className="lg:w-1/3 space-y-12">
             <div>
                <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-[10px] font-black uppercase tracking-widest mb-6">
-                 <Sparkles size={12} /> Architect Portal
+                 <Sparkles size={12} /> Refinement Portal
                </div>
                <h1 className="text-5xl font-black tracking-tighter leading-none mb-6">
-                 Post Your <br />
-                 <span className="text-gradient">Masterpiece</span>
+                 Edit Your <br />
+                 <span className="text-gradient">Strategic</span>
                </h1>
             </div>
 
@@ -145,7 +179,7 @@ const CreateProjectPage = () => {
                {[
                  { s: 1, label: "Core Vision", desc: "Title & Purpose" },
                  { s: 2, label: "Resource Allocation", desc: "Budget & Scope" },
-                 { s: 3, label: "Strategy & Deploy", desc: "Skills & Launch" },
+                 { s: 3, label: "Strategy & Deploy", desc: "Skills & Save" },
                ].map((item) => (
                  <div key={item.s} className="flex items-center gap-6">
                     <div className={`w-12 h-12 rounded-2xl flex items-center justify-center font-black text-sm transition-all duration-500 ${
@@ -298,9 +332,9 @@ const CreateProjectPage = () => {
                        </button>
                        <button 
                          type="submit" disabled={loading}
-                         className="px-16 py-7 rounded-[2rem] bg-primary text-white font-black text-sm uppercase tracking-widest hover:scale-105 disabled:opacity-50 transition-all flex items-center gap-4 shadow-2xl"
+                         className="px-16 py-7 rounded-[2rem] bg-emerald-600 text-white font-black text-sm uppercase tracking-widest hover:scale-105 disabled:opacity-50 transition-all flex items-center gap-4 shadow-2xl"
                        >
-                         {loading ? "Launching..." : "Launch Project"} <Rocket size={22} />
+                         {loading ? "Saving..." : "Update Project"} <Save size={22} />
                        </button>
                     </div>
                   </motion.div>
@@ -314,4 +348,4 @@ const CreateProjectPage = () => {
   );
 };
 
-export default CreateProjectPage;
+export default EditProjectPage;

@@ -20,8 +20,12 @@ export const messageService = {
   },
 
   // Send a message
-  sendMessage: async (conversationId: string, content: string) => {
-    const response = await apiClient.post(`/messages/conversations/${conversationId}/messages`, { content });
+  sendMessage: async (conversationId: string, content: string, attachmentUrl?: string, attachmentType?: string) => {
+    const response = await apiClient.post(`/messages/conversations/${conversationId}/messages`, { 
+      content, 
+      attachmentUrl, 
+      attachmentType 
+    });
     return response.data;
   }
 };

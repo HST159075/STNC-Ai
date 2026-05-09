@@ -7,7 +7,8 @@ import {
   Phone, Video, Info, User,
   Clock, ShieldCheck, Zap,
   MessageSquare, Layout, Image as ImageIcon,
-  Paperclip, Smile, ArrowLeft
+  Paperclip, Smile, ArrowLeft, FileText,
+  Download, ExternalLink, X
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { messageService } from "@/services/messageService";
@@ -15,6 +16,8 @@ import { useSession } from "@/lib/auth-client";
 import Navbar from "@/components/layout/Navbar";
 import Sidebar from "@/components/layout/Sidebar";
 import { socket } from "@/lib/socket";
+import apiClient from "@/lib/axios";
+import { toast } from "sonner";
 
 import { Suspense } from "react";
 
@@ -27,7 +30,11 @@ function MessagesContent() {
   const [messages, setMessages] = useState<any[]>([]);
   const [newMessage, setNewMessage] = useState("");
   const [loading, setLoading] = useState(true);
+  const [uploading, setUploading] = useState(false);
+  const [attachedFile, setAttachedFile] = useState<any>(null);
   const messagesEndRef = useRef<null | HTMLDivElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const imageInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     fetchConversations();
@@ -117,14 +124,49 @@ function MessagesContent() {
 
   const handleSend = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newMessage.trim() || !selectedConversation) return;
+    if ((!newMessage.trim() && !attachedFile) || !selectedConversation) return;
 
     try {
-      const res = await messageService.sendMessage(selectedConversation.id, newMessage);
+      const res = await messageService.sendMessage(
+        selectedConversation.id, 
+        newMessage, 
+        attachedFile?.url, 
+        attachedFile?.type
+      );
       setMessages([...messages, res.message]);
       setNewMessage("");
+      setAttachedFile(null);
     } catch (error) {
       console.error("Send error:", error);
+      toast.error("Failed to send message");
+    }
+  };
+
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>, type: 'image' | 'file') => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setUploading(true);
+    const formData = new FormData();
+    formData.append(type, file);
+
+    try {
+      const endpoint = type === 'image' ? '/uploads/image' : '/uploads/file';
+      const res = await apiClient.post(endpoint, formData);
+      
+      if (res.data.success) {
+        setAttachedFile({
+          url: type === 'image' ? res.data.imageUrl : res.data.fileUrl,
+          name: file.name,
+          type: type === 'image' ? 'IMAGE' : 'FILE'
+        });
+        toast.success(`${type === 'image' ? 'Image' : 'File'} attached`);
+      }
+    } catch (error) {
+      console.error("Upload error:", error);
+      toast.error("Upload failed");
+    } finally {
+      setUploading(false);
     }
   };
 
@@ -242,6 +284,22 @@ function MessagesContent() {
                         <div className={`px-6 py-4 rounded-[2rem] text-sm font-medium shadow-sm ${
                           isMe ? "bg-primary text-white rounded-tr-none" : "bg-bg-card border border-border text-text-main rounded-tl-none"
                         }`}>
+                          {msg.attachmentUrl && msg.attachmentType === 'IMAGE' && (
+                            <div className="mb-4 rounded-2xl overflow-hidden border border-white/20">
+                              <img src={msg.attachmentUrl} className="max-w-full h-auto object-cover" alt="Attachment" />
+                            </div>
+                          )}
+                          {msg.attachmentUrl && msg.attachmentType === 'FILE' && (
+                            <div className={`mb-4 p-4 rounded-2xl flex items-center gap-4 ${isMe ? "bg-white/10" : "bg-bg-main"}`}>
+                               <div className="w-10 h-10 bg-primary/20 text-primary rounded-xl flex items-center justify-center">
+                                  <FileText size={20} />
+                               </div>
+                               <div className="flex-1 min-w-0">
+                                  <p className="text-[10px] font-black truncate max-w-[150px]">Document Attachment</p>
+                                  <a href={msg.attachmentUrl} target="_blank" className="text-[8px] font-bold underline opacity-70">Download File</a>
+                               </div>
+                            </div>
+                          )}
                           {msg.content}
                         </div>
                         <p className="text-[8px] font-black uppercase text-text-muted px-2">
@@ -258,18 +316,47 @@ function MessagesContent() {
               <div className="p-6 bg-bg-card border-t border-border">
                 <form onSubmit={handleSend} className="flex items-center gap-4">
                   <div className="flex gap-2">
-                    <button type="button" className="w-10 h-10 text-text-muted hover:text-primary transition-colors"><Paperclip size={20} /></button>
-                    <button type="button" className="w-10 h-10 text-text-muted hover:text-primary transition-colors"><ImageIcon size={20} /></button>
+                    <input 
+                      type="file" ref={fileInputRef} className="hidden" 
+                      onChange={(e) => handleFileChange(e, 'file')} 
+                    />
+                    <input 
+                      type="file" ref={imageInputRef} className="hidden" accept="image/*" 
+                      onChange={(e) => handleFileChange(e, 'image')} 
+                    />
+                    <button 
+                      type="button" onClick={() => fileInputRef.current?.click()}
+                      className="w-10 h-10 text-text-muted hover:text-primary transition-colors"
+                    >
+                      <Paperclip size={20} />
+                    </button>
+                    <button 
+                      type="button" onClick={() => imageInputRef.current?.click()}
+                      className="w-10 h-10 text-text-muted hover:text-primary transition-colors"
+                    >
+                      <ImageIcon size={20} />
+                    </button>
                   </div>
                   <div className="flex-1 relative">
                     <input 
                       type="text" 
                       value={newMessage}
                       onChange={(e) => setNewMessage(e.target.value)}
-                      placeholder="Draft a strategic message..." 
-                      className="w-full bg-bg-main border border-border px-6 py-4 rounded-2xl text-sm font-bold focus:outline-none focus:border-primary transition-all"
+                      placeholder={attachedFile ? `Attached: ${attachedFile.name}` : "Draft a strategic message..."}
+                      className={`w-full bg-bg-main border border-border px-6 py-4 rounded-2xl text-sm font-bold focus:outline-none focus:border-primary transition-all ${attachedFile ? "border-primary/50 ring-1 ring-primary/20" : ""}`}
                     />
-                    <button type="button" className="absolute right-4 top-1/2 -translate-y-1/2 text-text-muted hover:text-primary transition-colors"><Smile size={20} /></button>
+                    {attachedFile ? (
+                      <button 
+                        type="button" onClick={() => setAttachedFile(null)}
+                        className="absolute right-4 top-1/2 -translate-y-1/2 text-red-500 hover:scale-110 transition-all"
+                      >
+                        <X size={20} />
+                      </button>
+                    ) : (
+                      <button type="button" className="absolute right-4 top-1/2 -translate-y-1/2 text-text-muted hover:text-primary transition-colors">
+                        <Smile size={20} />
+                      </button>
+                    )}
                   </div>
                   <button 
                     type="submit"

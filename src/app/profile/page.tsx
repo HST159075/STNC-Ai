@@ -7,11 +7,11 @@ import {
   Zap, Edit3, Sparkles, ArrowRight,
   Star, Award, CheckCircle2, Layout,
   Settings, LogOut, Trophy, Clock, ArrowRightCircle,
-  Upload
+  Upload, Trash2, MoreVertical
 } from "lucide-react";
 import Navbar from "@/components/layout/Navbar";
 import Sidebar from "@/components/layout/Sidebar";
-import { useSession, signOut } from "@/lib/auth-client";
+import { useSession, signOut, authClient } from "@/lib/auth-client";
 import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import { userService } from "@/services/userService";
@@ -23,8 +23,14 @@ import apiClient from "@/lib/axios";
 
 export default function ProfilePage() {
   const router = useRouter();
-   const { data: session } = useSession();
-   const userData = session?.user as any;
+    const { data: session, isPending } = useSession();
+    const userData = session?.user as any;
+
+    useEffect(() => {
+      if (!isPending && !session) {
+        router.push("/");
+      }
+    }, [session, isPending, router]);
    const [hireHistory, setHireHistory] = useState<any[]>([]);
    const [myProjects, setMyProjects] = useState<any[]>([]);
    const [loadingHistory, setLoadingHistory] = useState(true);
@@ -105,18 +111,42 @@ export default function ProfilePage() {
          const formDataFile = new FormData();
          formDataFile.append('image', file);
 
-         const response = await apiClient.post('/uploads/image', formDataFile, {
-            headers: { 'Content-Type': 'multipart/form-data' }
-         });
+         const response = await apiClient.post('/uploads/image', formDataFile);
 
          if (response.data.success) {
-            setEditForm({ ...editForm, image: response.data.imageUrl });
+            const newImageUrl = response.data.imageUrl;
+            
+            // Update user profile with the new image URL
+            await userService.updateProfile({ 
+               image: newImageUrl,
+               avatarUrl: newImageUrl 
+            });
+            
+            // Update local state for the form
+            setEditForm(prev => ({ ...prev, image: newImageUrl }));
+            
+            // Refresh the session to get updated user data
+            await authClient.getSession();
+            
+            alert("Profile image updated successfully!");
          }
       } catch (error) {
          console.error("Upload failed:", error);
          alert("Failed to upload image. Please try again.");
       } finally {
          setUploading(false);
+      }
+    };
+    const handleDeleteProject = async (projectId: string) => {
+      if (!confirm("Are you sure you want to delete this strategic blueprint? This action is irreversible.")) return;
+      
+      try {
+        await projectService.deleteProject(projectId);
+        setMyProjects(prev => prev.filter(p => p.id !== projectId));
+        alert("Project deleted successfully");
+      } catch (error) {
+        console.error("Delete error:", error);
+        alert("Failed to delete project");
       }
     };
 
@@ -150,7 +180,7 @@ export default function ProfilePage() {
    };
 
 
-  if (!userData) {
+  if (isPending || !userData) {
     return (
       <div className="min-h-screen bg-bg-main flex items-center justify-center">
         <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
@@ -398,7 +428,7 @@ export default function ProfilePage() {
                            {loadingProjects ? (
                              [1, 2].map(i => <div key={i} className="h-24 bg-bg-main animate-pulse rounded-3xl" />)
                            ) : myProjects.length > 0 ? (
-                             myProjects.map((project: any) => (
+                            myProjects.map((project: any) => (
                                <div key={project.id} className="p-8 rounded-[2.5rem] bg-bg-main border border-transparent hover:border-primary/20 hover:bg-white transition-all group flex flex-col md:flex-row md:items-center justify-between gap-6">
                                   <div className="flex-1">
                                      <div className="flex items-center gap-3 mb-2">
@@ -418,12 +448,28 @@ export default function ProfilePage() {
                                         <p className="text-lg font-black">${project.budgetMax}</p>
                                         <p className="text-[9px] font-black text-text-muted uppercase tracking-widest">{project._count?.bids || 0} Proposals</p>
                                      </div>
-                                     <button 
-                                       onClick={() => router.push(`/projects/${project.id}`)}
-                                       className="w-14 h-14 bg-white border border-border rounded-2xl flex items-center justify-center text-primary hover:bg-primary hover:text-white transition-all shadow-xl shadow-primary/5"
-                                     >
-                                        <ArrowRightCircle size={20} />
-                                     </button>
+                                     <div className="flex items-center gap-3">
+                                       <button 
+                                         onClick={() => router.push(`/projects/${project.id}/edit`)}
+                                         className="w-11 h-11 bg-white border border-border rounded-xl flex items-center justify-center text-text-muted hover:text-primary transition-all"
+                                         title="Edit Project"
+                                       >
+                                          <Edit3 size={16} />
+                                       </button>
+                                       <button 
+                                         onClick={() => handleDeleteProject(project.id)}
+                                         className="w-11 h-11 bg-white border border-border rounded-xl flex items-center justify-center text-text-muted hover:text-red-500 transition-all"
+                                         title="Delete Project"
+                                       >
+                                          <Trash2 size={16} />
+                                       </button>
+                                       <button 
+                                         onClick={() => router.push(`/projects/${project.id}`)}
+                                         className="w-14 h-14 bg-white border border-border rounded-2xl flex items-center justify-center text-primary hover:bg-primary hover:text-white transition-all shadow-xl shadow-primary/5"
+                                       >
+                                          <ArrowRightCircle size={20} />
+                                       </button>
+                                     </div>
                                   </div>
                                </div>
                              ))
@@ -498,7 +544,7 @@ export default function ProfilePage() {
                                   {uploading ? "Uploading..." : "Direct Upload"}
                                </span>
                             </div>
-                            <input type="file" className="hidden" accept="image/*" onChange={handleProfileImageUpload} />
+                            <input type="file" className="hidden" accept="image/png, image/jpeg, image/webp" onChange={handleProfileImageUpload} />
                          </label>
                       </div>
                       <input 
