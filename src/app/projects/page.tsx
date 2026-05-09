@@ -13,6 +13,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { projectService } from "@/services/projectService";
 import Navbar from "@/components/layout/Navbar";
 import Link from "next/link";
+import { formatRelativeTime } from "@/lib/utils";
 
 const CATEGORIES = ["All", "Web Development", "Mobile Apps", "UI/UX Design", "AI & Data", "Blockchain", "Marketing"];
 const BUDGET_RANGES = ["All", "Under $500", "$500 - $2000", "$2000 - $5000", "Above $5000"];
@@ -200,7 +201,7 @@ function ProjectsContent() {
                                      </p>
                                      <div className="flex flex-wrap gap-4 pt-4">
                                         <div className="flex items-center gap-2 text-[10px] font-black text-text-muted uppercase tracking-widest">
-                                           <Clock size={12} className="text-primary" /> 2 Hours Ago
+                                           <Clock size={12} className="text-primary" /> {formatRelativeTime(p.createdAt)}
                                         </div>
                                         <div className="flex items-center gap-2 text-[10px] font-black text-text-muted uppercase tracking-widest">
                                            <MapPin size={12} className="text-primary" /> Remote

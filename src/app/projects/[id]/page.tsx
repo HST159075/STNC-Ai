@@ -18,6 +18,7 @@ import Navbar from "@/components/layout/Navbar";
 import AiBidAuditor from "@/components/ai/AiBidAuditor";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import apiClient from "@/lib/axios";
+import { formatRelativeTime } from "@/lib/utils";
 
 export default function ProjectDetailPage() {
   const params = useParams();
@@ -198,7 +199,7 @@ export default function ProjectDetailPage() {
                    </div>
                    <div className="space-y-1">
                       <p className="text-[10px] font-black uppercase text-text-muted tracking-widest">Posted</p>
-                      <p className="text-lg font-black">2 Hours Ago</p>
+                      <p className="text-lg font-black">{project?.createdAt ? formatRelativeTime(project.createdAt) : "Just now"}</p>
                    </div>
                 </div>
               </motion.div>
