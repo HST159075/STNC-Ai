@@ -5,18 +5,20 @@ import { usePathname } from "next/navigation";
 import { 
   Zap, MessageSquare, User, 
   Bell, Search, Briefcase, 
-  LayoutDashboard, Menu, X 
+  LayoutDashboard, Menu, X,
+  LogOut, History, Settings,
+  PlusCircle
 } from "lucide-react";
 import { useSession, signOut } from "@/lib/auth-client";
 import { motion, AnimatePresence } from "framer-motion";
 import { useState, useEffect } from "react";
 import apiClient from "@/lib/axios";
 import NotificationBell from "./NotificationBell";
-import { LogOut } from "lucide-react";
 
 export default function Navbar() {
   const pathname = usePathname();
   const { data: session } = useSession();
+  const user = session?.user as any;
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
@@ -30,6 +32,18 @@ export default function Navbar() {
     { name: "Discover", href: "/projects", icon: Search },
     { name: "Marketplace", href: "/marketplace", icon: Briefcase },
     { name: "Strategic Hub", href: "/dashboard", icon: LayoutDashboard },
+  ];
+
+  // Sidebar links shown in mobile menu (lg:hidden)
+  const sidebarLinks = [
+    { name: "Overview", href: "/dashboard", icon: LayoutDashboard },
+    ...(user?.role === "CLIENT"
+      ? [{ name: "Post Project", href: "/projects/create", icon: PlusCircle }]
+      : [{ name: "Browse Projects", href: "/projects", icon: Search }]
+    ),
+    { name: "History", href: "/dashboard/history", icon: History },
+    { name: "Profile", href: "/profile", icon: User },
+    { name: "Settings", href: "/settings", icon: Settings },
   ];
 
   return (
@@ -120,21 +134,65 @@ export default function Navbar() {
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
-            className="absolute top-full left-6 right-6 mt-4 p-8 bg-bg-card border border-border rounded-[2.5rem] shadow-2xl lg:hidden"
+            className="absolute top-full left-6 right-6 mt-4 p-6 bg-bg-card border border-border rounded-[2.5rem] shadow-2xl lg:hidden"
           >
-            <div className="flex flex-col gap-6">
+            {/* Sidebar Navigation — only visible on mobile */}
+            {session && (
+              <>
+                <p className="text-[9px] font-black uppercase tracking-widest text-text-muted mb-3 ml-2">Navigation</p>
+                <div className="flex flex-col gap-1 mb-5">
+                  {sidebarLinks.map((link) => {
+                    const isActive = pathname === link.href;
+                    return (
+                      <Link 
+                        key={link.name} 
+                        href={link.href}
+                        onClick={() => setMobileMenuOpen(false)}
+                        className={`flex items-center gap-4 px-4 py-3 rounded-2xl transition-all font-bold text-sm ${
+                          isActive
+                            ? "bg-primary text-white shadow-lg shadow-primary/20"
+                            : "text-text-muted hover:bg-bg-main hover:text-text-main"
+                        }`}
+                      >
+                        <link.icon size={18} />
+                        {link.name}
+                      </Link>
+                    );
+                  })}
+                </div>
+                <div className="h-px bg-border mb-5" />
+              </>
+            )}
+
+            {/* Top Nav Links */}
+            <p className="text-[9px] font-black uppercase tracking-widest text-text-muted mb-3 ml-2">Explore</p>
+            <div className="flex flex-col gap-1 mb-5">
               {navLinks.map((link) => (
                 <Link 
                   key={link.name} 
                   href={link.href}
                   onClick={() => setMobileMenuOpen(false)}
-                  className="text-xs font-black uppercase tracking-widest text-text-muted flex items-center gap-4"
+                  className="text-sm font-bold text-text-muted flex items-center gap-4 px-4 py-3 rounded-2xl hover:bg-bg-main hover:text-text-main transition-all"
                 >
-                  <div className="w-10 h-10 bg-bg-main rounded-xl flex items-center justify-center"><link.icon size={18} /></div>
+                  <link.icon size={18} />
                   {link.name}
                 </Link>
               ))}
             </div>
+
+            {/* Logout */}
+            {session && (
+              <>
+                <div className="h-px bg-border mb-4" />
+                <button
+                  onClick={() => { signOut(); setMobileMenuOpen(false); }}
+                  className="w-full flex items-center gap-4 px-4 py-3 rounded-2xl text-red-500 hover:bg-red-500/5 transition-all font-bold text-sm"
+                >
+                  <LogOut size={18} />
+                  Logout
+                </button>
+              </>
+            )}
           </motion.div>
         )}
       </AnimatePresence>

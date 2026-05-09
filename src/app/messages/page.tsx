@@ -185,10 +185,11 @@ function MessagesContent() {
   return (
     <div className="h-screen bg-bg-main overflow-hidden flex flex-col">
       <Navbar />
+      <Sidebar />
       
-      <div className="flex flex-1 pt-24 pl-24 pr-8 pb-8 overflow-hidden">
+      <div className="flex flex-1 pt-28 pb-4 px-4 sm:px-8 lg:pl-[300px] lg:pt-28 lg:pr-8 lg:pb-8 overflow-hidden gap-6">
         {/* Chat Sidebar */}
-        <div className="w-96 bg-bg-card border border-border rounded-l-[3rem] flex flex-col overflow-hidden shadow-2xl shadow-black/10">
+        <div className={`w-full lg:w-96 bg-bg-card border border-border rounded-3xl lg:rounded-l-[3rem] flex-col overflow-hidden shadow-2xl shadow-black/10 ${selectedConversation ? 'hidden lg:flex' : 'flex'}`}>
           <div className="p-8 border-b border-border">
             <div className="flex items-center justify-between mb-8">
               <h2 className="text-2xl font-black tracking-tight">Messages</h2>
@@ -246,13 +247,19 @@ function MessagesContent() {
         </div>
 
         {/* Chat Window */}
-        <div className="flex-1 bg-bg-card border-y border-r border-border rounded-r-[3rem] flex flex-col overflow-hidden relative shadow-2xl shadow-black/10">
+        <div className={`flex-1 bg-bg-card border border-border rounded-3xl lg:rounded-l-none lg:rounded-r-[3rem] flex-col overflow-hidden relative shadow-2xl shadow-black/10 ${!selectedConversation ? 'hidden lg:flex' : 'flex'}`}>
           {selectedConversation ? (
             <>
               {/* Chat Header */}
-              <div className="p-6 border-b border-border flex items-center justify-between bg-bg-card/50 backdrop-blur-xl z-10">
+              <div className="p-4 sm:p-6 border-b border-border flex items-center justify-between bg-bg-card/50 backdrop-blur-xl z-10">
                 <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 rounded-2xl overflow-hidden border border-border">
+                  <button 
+                    onClick={() => setSelectedConversation(null)}
+                    className="lg:hidden w-10 h-10 rounded-xl hover:bg-bg-main flex items-center justify-center text-text-muted transition-colors"
+                  >
+                    <ArrowLeft size={18} />
+                  </button>
+                  <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-2xl overflow-hidden border border-border">
                     <img src={getOtherParticipant(selectedConversation)?.avatarUrl || "https://api.dicebear.com/7.x/avataaars/svg"} className="w-full h-full object-cover" alt="" />
                   </div>
                   <div>

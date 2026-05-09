@@ -44,7 +44,7 @@ export default function Sidebar() {
   return (
     <motion.aside 
       animate={{ width: isCollapsed ? 80 : 280 }}
-      className="fixed left-0 top-0 h-screen bg-bg-card border-r border-border z-[90] transition-all"
+      className="hidden lg:flex flex-col fixed left-0 top-0 h-screen bg-bg-card border-r border-border z-[90] transition-all"
     >
       <div className="p-6 flex items-center justify-between">
         {!isCollapsed && (
@@ -61,7 +61,7 @@ export default function Sidebar() {
         </button>
       </div>
 
-      <nav className="mt-10 px-4 space-y-2">
+      <nav className="mt-10 px-4 space-y-2 flex-1">
         {links.map((link) => {
           const isActive = pathname === link.href;
           return (
@@ -79,7 +79,7 @@ export default function Sidebar() {
         })}
       </nav>
 
-      <div className="absolute bottom-10 left-0 w-full px-4">
+      <div className="w-full px-4 pb-10">
         <button 
           onClick={() => signOut()}
           className="w-full flex items-center gap-4 p-4 rounded-2xl text-red-500 hover:bg-red-500/5 transition-all"

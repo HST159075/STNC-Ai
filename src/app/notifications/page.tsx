@@ -61,7 +61,7 @@ export default function NotificationsPage() {
       <Navbar />
       <Sidebar />
 
-      <main className="pl-[280px] pt-32 pb-20 px-12">
+      <main className="pt-28 pb-20 px-4 sm:px-8 lg:pl-[280px] lg:pt-32">
         <div className="container mx-auto max-w-4xl">
           <header className="mb-12 flex items-center justify-between">
             <div>

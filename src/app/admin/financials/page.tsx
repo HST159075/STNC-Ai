@@ -62,7 +62,7 @@ export default function AdminFinancialsPage() {
     <div className="min-h-screen bg-bg-main flex">
       <Sidebar />
       
-      <main className="flex-1 ml-[280px] p-12 overflow-y-auto">
+      <main className="flex-1 p-6 sm:p-12 lg:ml-[280px] overflow-y-auto pt-28 lg:pt-12">
         <Navbar />
 
         <header className="mb-12 mt-10">

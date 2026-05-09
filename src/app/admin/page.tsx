@@ -79,7 +79,7 @@ export default function AdminDashboard() {
     <div className="min-h-screen bg-bg-main flex">
       <Sidebar />
       
-      <main className="flex-1 ml-[280px] p-12 overflow-y-auto">
+      <main className="flex-1 p-6 sm:p-12 lg:ml-[280px] overflow-y-auto pt-28 lg:pt-12">
         <header className="mb-12">
           <div className="flex items-center gap-3 mb-2 text-primary font-bold uppercase tracking-widest text-xs">
             <ShieldAlert size={16} /> Admin Authority

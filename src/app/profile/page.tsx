@@ -195,7 +195,7 @@ export default function ProfilePage() {
       <Navbar />
       <Sidebar />
 
-      <main className="pl-24 pt-32 pb-20 px-8">
+      <main className="pt-28 pb-20 px-4 sm:px-8 lg:pl-72 lg:pt-32">
         <div className="container mx-auto max-w-6xl">
           {/* Header Section */}
           <div className="flex flex-col md:flex-row items-center gap-8 mb-16">
