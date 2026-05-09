@@ -6,7 +6,8 @@ import {
   Briefcase, Calendar, ShieldCheck, 
   Zap, Edit3, Sparkles, ArrowRight,
   Star, Award, CheckCircle2, Layout,
-  Settings, LogOut, Trophy, Clock, ArrowRightCircle
+  Settings, LogOut, Trophy, Clock, ArrowRightCircle,
+  Upload
 } from "lucide-react";
 import Navbar from "@/components/layout/Navbar";
 import Sidebar from "@/components/layout/Sidebar";
@@ -86,6 +87,37 @@ export default function ProfilePage() {
         });
       }
     }, [userData]);
+
+    const [uploading, setUploading] = useState(false);
+    const [imagePreview, setImagePreview] = useState<string | null>(null);
+
+    const handleProfileImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+      const file = e.target.files?.[0];
+      if (!file) return;
+
+      setUploading(true);
+      const reader = new FileReader();
+      reader.onloadend = () => setImagePreview(reader.result as string);
+      reader.readAsDataURL(file);
+
+      try {
+         const formDataFile = new FormData();
+         formDataFile.append('image', file);
+
+         const response = await apiClient.post('/uploads/image', formDataFile, {
+            headers: { 'Content-Type': 'multipart/form-data' }
+         });
+
+         if (response.data.success) {
+            setEditForm({ ...editForm, image: response.data.imageUrl });
+         }
+      } catch (error) {
+         console.error("Upload failed:", error);
+         alert("Failed to upload image. Please try again.");
+      } finally {
+         setUploading(false);
+      }
+    };
 
     const handleUpdateProfile = async (e: React.FormEvent) => {
       e.preventDefault();
@@ -444,12 +476,33 @@ export default function ProfilePage() {
                       />
                    </div>
                    <div className="space-y-2">
-                      <label className="text-[10px] font-black uppercase text-text-muted ml-2 tracking-widest">Profile Image URL</label>
+                      <label className="text-[10px] font-black uppercase text-text-muted ml-2 tracking-widest">Strategic Avatar</label>
+                      <div className="flex items-center gap-6 p-4 bg-bg-main border border-border rounded-2xl">
+                         <div className="w-16 h-16 rounded-2xl overflow-hidden border border-border relative">
+                            <img 
+                              src={imagePreview || editForm.image || `https://api.dicebear.com/7.x/avataaars/svg?seed=${editForm.name}`} 
+                              className="w-full h-full object-cover" 
+                              alt="Preview" 
+                            />
+                            {uploading && (
+                               <div className="absolute inset-0 bg-bg-main/60 flex items-center justify-center">
+                                  <div className="w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+                               </div>
+                            )}
+                         </div>
+                         <label className="flex-1 cursor-pointer">
+                            <div className="flex items-center gap-3 px-6 py-3 bg-bg-card border border-border rounded-xl hover:border-primary transition-all">
+                               <Upload size={16} className="text-primary" />
+                               <span className="text-[10px] font-black uppercase tracking-widest">
+                                  {uploading ? "Uploading..." : "Direct Upload"}
+                               </span>
+                            </div>
+                            <input type="file" className="hidden" accept="image/*" onChange={handleProfileImageUpload} />
+                         </label>
+                      </div>
                       <input 
-                        type="text" 
+                        type="hidden" 
                         value={editForm.image}
-                        onChange={(e) => setEditForm({...editForm, image: e.target.value})}
-                        className="w-full bg-bg-main border border-border px-6 py-4 rounded-2xl focus:outline-none focus:ring-2 focus:ring-primary/50 font-bold text-xs"
                       />
                    </div>
                    <div className="space-y-2">

@@ -180,6 +180,18 @@ export default function ProjectDetailPage() {
                       <ShieldCheck size={14} /> Verified Client
                    </span>
                 </div>
+
+                {project?.imageUrl && (
+                   <div className="w-full h-[400px] rounded-[3rem] overflow-hidden border border-border mb-10 group relative">
+                      <img 
+                        src={project.imageUrl} 
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" 
+                        alt={project.title} 
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                   </div>
+                )}
+
                 <h1 className="text-4xl md:text-6xl font-black tracking-tight leading-[1.1] mb-8">
                   {project?.title}
                 </h1>
