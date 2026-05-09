@@ -15,11 +15,27 @@ import { projectService } from "@/services/projectService";
 import axios from "axios";
 
 export default function HomePage() {
+  const defaultTestimonials = [
+    {
+      comment: "NexusMarket transformed how we scale our engineering team. The AI matching is terrifyingly accurate.",
+      reviewer: { name: "Sarah Jenkins", role: "CTO, TechFlow", image: "https://api.dicebear.com/7.x/avataaars/svg?seed=Sarah" }
+    },
+    {
+      comment: "As a senior architect, I finally found a platform that values strategic thinking over basic coding.",
+      reviewer: { name: "David Chen", role: "Elite Architect", image: "https://api.dicebear.com/7.x/avataaars/svg?seed=David" }
+    },
+    {
+      comment: "The built-in escrow and milestone tracking makes managing multi-million dollar projects a breeze.",
+      reviewer: { name: "Elena Rodriguez", role: "Product VP", image: "https://api.dicebear.com/7.x/avataaars/svg?seed=Elena" }
+    }
+  ];
+
   const [activeFaq, setActiveFaq] = useState<number | null>(null);
   const [realStats, setRealStats] = useState<any>(null);
   const [featuredProjects, setFeaturedProjects] = useState<any[]>([]);
-  const [testimonials, setTestimonials] = useState<any[]>([]);
+  const [testimonials, setTestimonials] = useState<any[]>(defaultTestimonials);
   const [faqs, setFaqs] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     fetchPublicData();
@@ -32,12 +48,16 @@ export default function HomePage() {
       
       if (statsRes.data.success) {
         setRealStats(statsRes.data.stats);
-        setTestimonials(statsRes.data.testimonials || []);
+        if (statsRes.data.testimonials && statsRes.data.testimonials.length > 0) {
+          setTestimonials(statsRes.data.testimonials);
+        }
         setFaqs(statsRes.data.faqs || []);
       }
       if (projectsRes.success) setFeaturedProjects(projectsRes.projects.slice(0, 4));
     } catch (error) {
       console.error("Failed to fetch landing page data:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -206,7 +226,7 @@ export default function HomePage() {
                 </li>
               ))}
             </ul>
-            <button className="btn-primary">Try AI Architect</button>
+            <Link href="/ai-architect" className="btn-primary inline-flex items-center justify-center">Try AI Architect</Link>
           </div>
           
           <div className="lg:w-1/2 grid grid-cols-2 gap-6">
@@ -473,14 +493,7 @@ export default function HomePage() {
         </div>
       </footer>
       
-      {/* 5. AI Chat Bubble */}
-      <motion.button 
-        whileHover={{ scale: 1.1 }}
-        whileTap={{ scale: 0.9 }}
-        className="fixed bottom-8 right-8 w-16 h-16 bg-primary rounded-full shadow-2xl shadow-primary/40 flex items-center justify-center text-white z-[100]"
-      >
-        <Sparkles size={28} />
-      </motion.button>
+
     </div>
   );
 }
