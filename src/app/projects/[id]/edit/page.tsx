@@ -21,7 +21,7 @@ const EditProjectPage = () => {
   const { data: session } = useSession();
   const router = useRouter();
   const params = useParams();
-  const projectId = params.projectId as string;
+  const id = params.id as string;
   
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
@@ -45,11 +45,11 @@ const EditProjectPage = () => {
   useEffect(() => {
     setIsMounted(true);
     fetchProject();
-  }, [projectId]);
+  }, [id]);
 
   const fetchProject = async () => {
     try {
-      const res = await projectService.getProjectById(projectId);
+      const res = await projectService.getProjectById(id);
       if (res.success) {
         const project = res.project;
         setFormData({
@@ -131,13 +131,13 @@ const EditProjectPage = () => {
     setError('');
 
     try {
-      const response = await projectService.updateProject(projectId, {
+      const response = await projectService.updateProject(id, {
         ...formData,
         tags: formData.tags.split(',').map(tag => tag.trim()),
       });
 
       if (response.success) {
-        router.push(`/projects/${projectId}`);
+        router.push(`/projects/${id}`);
       }
     } catch (err: any) {
       setError(err.response?.data?.message || 'Failed to update project');
