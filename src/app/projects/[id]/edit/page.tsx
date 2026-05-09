@@ -110,7 +110,9 @@ const EditProjectPage = () => {
        const formDataFile = new FormData();
        formDataFile.append('image', file);
 
-       const response = await apiClient.post('/uploads/image', formDataFile);
+       const response = await apiClient.post('/uploads/image', formDataFile, {
+          headers: { 'Content-Type': 'multipart/form-data' }
+       });
 
        if (response.data.success) {
           setFormData({ ...formData, imageUrl: response.data.imageUrl });
