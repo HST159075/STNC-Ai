@@ -13,7 +13,7 @@ import {
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
-import axios from "axios";
+import apiClient from "@/lib/axios";
 import { useDebounce } from "@/hooks/useDebounce";
 
 export default function HistoryPage() {
@@ -27,11 +27,8 @@ export default function HistoryPage() {
   const { data, isLoading } = useQuery({
     queryKey: ['transactions', debouncedSearch, page],
     queryFn: async () => {
-      const { data } = await axios.get("http://localhost:5000/api/users/history", {
-        params: { search: debouncedSearch, page, limit },
-        headers: {
-            // Usually handled by cookies/BetterAuth middleware on server
-        }
+      const { data } = await apiClient.get("/users/history", {
+        params: { search: debouncedSearch, page, limit }
       });
       return data;
     },

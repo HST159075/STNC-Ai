@@ -9,7 +9,7 @@ import { useRouter } from "next/navigation";
 import { useMarketplaceStore } from "@/hooks/useMarketplaceStore";
 import { useDebounce } from "@/hooks/useDebounce";
 import { useQuery } from "@tanstack/react-query";
-import axios from "axios";
+import apiClient from "@/lib/axios";
 
 export default function MarketplacePage() {
   const router = useRouter();
@@ -25,7 +25,7 @@ export default function MarketplacePage() {
   const { data, isLoading } = useQuery({
     queryKey: ['freelancers', debouncedSearch, category, minPrice, maxPrice, page],
     queryFn: async () => {
-      const { data } = await axios.get("http://localhost:5000/api/users/freelancers", {
+      const { data } = await apiClient.get("/users/freelancers", {
         params: { search: debouncedSearch, category, minPrice, maxPrice, page, limit }
       });
       return data;

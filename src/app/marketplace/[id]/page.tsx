@@ -2,7 +2,7 @@
 
 import { useParams, useRouter } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
-import axios from "axios";
+import apiClient from "@/lib/axios";
 import Navbar from "@/components/layout/Navbar";
 import { motion } from "framer-motion";
 import { 
@@ -20,7 +20,7 @@ export default function FreelancerDetailsPage() {
   const { data, isLoading } = useQuery({
     queryKey: ['freelancer', id],
     queryFn: async () => {
-      const { data } = await axios.get(`http://localhost:5000/api/users/profile/${id}`);
+      const { data } = await apiClient.get(`/users/profile/${id}`);
       return data.user;
     },
     enabled: !!id

@@ -12,7 +12,7 @@ import {
 } from 'lucide-react';
 
 import { useMutation } from '@tanstack/react-query';
-import axios from 'axios';
+import apiClient from '@/lib/axios';
 
 const AIArchitectPage = () => {
   const [prompt, setPrompt] = useState('');
@@ -20,10 +20,7 @@ const AIArchitectPage = () => {
 
   const mutation = useMutation({
     mutationFn: async (prompt: string) => {
-      const { data } = await axios.post('http://localhost:5000/api/ai/architect', 
-        { prompt },
-        { withCredentials: true }
-      );
+      const { data } = await apiClient.post('/ai/chat', { message: prompt });
       return data.advice;
     }
   });
