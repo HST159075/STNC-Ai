@@ -18,6 +18,7 @@ import { userService } from "@/services/userService";
 import { projectService } from "@/services/projectService";
 import AiProfileOptimizer from "@/components/ai/AiProfileOptimizer";
 import { formatRelativeTime } from "@/lib/utils";
+import apiClient from "@/lib/axios";
 
 
 export default function ProfilePage() {
