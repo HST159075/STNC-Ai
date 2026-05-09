@@ -30,4 +30,9 @@ export const adminService = {
     const response = await apiClient.get('/admin/projects', { params });
     return response.data;
   },
+  
+  getFinancials: async () => {
+    const response = await apiClient.get('/admin/financials');
+    return response.data;
+  },
 };
