@@ -7,11 +7,12 @@ import {
   Bell, Search, Briefcase, 
   LayoutDashboard, Menu, X 
 } from "lucide-react";
-import { useSession } from "@/lib/auth-client";
+import { useSession, signOut } from "@/lib/auth-client";
 import { motion, AnimatePresence } from "framer-motion";
 import { useState, useEffect } from "react";
 import apiClient from "@/lib/axios";
 import NotificationBell from "./NotificationBell";
+import { LogOut } from "lucide-react";
 
 export default function Navbar() {
   const pathname = usePathname();
@@ -87,6 +88,13 @@ export default function Navbar() {
                      />
                   </div>
                </Link>
+               <button 
+                 onClick={() => signOut()}
+                 className="w-11 h-11 bg-red-500/10 border border-red-500/20 rounded-xl flex items-center justify-center text-red-500 hover:bg-red-500 hover:text-white transition-all hidden md:flex"
+                 title="Logout"
+               >
+                  <LogOut size={18} />
+               </button>
             </div>
           ) : (
             <div className="flex items-center gap-6">

@@ -74,9 +74,9 @@ export default function HomePage() {
               <Link href="/projects" className="btn-primary flex items-center justify-center gap-2 px-10 py-5 text-lg">
                 Get Started <ArrowRight size={20} />
               </Link>
-              <button className="px-10 py-5 rounded-2xl bg-bg-card border border-border text-text-main font-bold hover:bg-bg-main transition-all">
-                Learn More
-              </button>
+              <Link href="/login" className="px-10 py-5 rounded-2xl bg-bg-card border border-border text-text-main font-bold hover:bg-bg-main transition-all flex items-center justify-center gap-2">
+                <ShieldCheck size={18} className="text-primary" /> Try Demo
+              </Link>
             </div>
           </motion.div>
           
