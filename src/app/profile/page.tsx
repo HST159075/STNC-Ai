@@ -14,7 +14,9 @@ import { useSession, signOut } from "@/lib/auth-client";
 import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import { userService } from "@/services/userService";
+import { projectService } from "@/services/projectService";
 import AiProfileOptimizer from "@/components/ai/AiProfileOptimizer";
+import { formatRelativeTime } from "@/lib/utils";
 
 
 export default function ProfilePage() {
@@ -22,7 +24,9 @@ export default function ProfilePage() {
    const { data: session } = useSession();
    const userData = session?.user as any;
    const [hireHistory, setHireHistory] = useState<any[]>([]);
+   const [myProjects, setMyProjects] = useState<any[]>([]);
    const [loadingHistory, setLoadingHistory] = useState(true);
+   const [loadingProjects, setLoadingProjects] = useState(true);
    const [profileData, setProfileData] = useState<any>(null);
    const [profileStats, setProfileStats] = useState<any>(null);
    const [loadingProfile, setLoadingProfile] = useState(true);
@@ -30,8 +34,20 @@ export default function ProfilePage() {
    useEffect(() => {
      if (userData?.id) {
        fetchProfile();
+       fetchMyProjects();
      }
    }, [userData?.id]);
+
+   const fetchMyProjects = async () => {
+     try {
+       const res = await projectService.getMyProjects();
+       if (res.success) setMyProjects(res.projects);
+     } catch (error) {
+       console.error("Fetch projects error:", error);
+     } finally {
+       setLoadingProjects(false);
+     }
+   };
 
    const fetchProfile = async () => {
      try {
@@ -332,6 +348,67 @@ export default function ProfilePage() {
                          )}
                       </div>
                    </div>
+
+                   {/* Posted Projects Section (For Clients) */}
+                   {userData.role === 'CLIENT' && (
+                     <div className="bg-bg-card border border-border p-12 rounded-[3.5rem] mt-10">
+                        <div className="flex items-center justify-between mb-10">
+                           <h3 className="text-2xl font-black flex items-center gap-4">
+                              <Layout size={28} className="text-primary" /> Project Blueprint Archive
+                           </h3>
+                           <span className="px-4 py-1 bg-bg-main border border-border rounded-full text-[10px] font-black uppercase tracking-widest text-text-muted">
+                              {myProjects.length} Active Posts
+                           </span>
+                        </div>
+
+                        <div className="space-y-6">
+                           {loadingProjects ? (
+                             [1, 2].map(i => <div key={i} className="h-24 bg-bg-main animate-pulse rounded-3xl" />)
+                           ) : myProjects.length > 0 ? (
+                             myProjects.map((project: any) => (
+                               <div key={project.id} className="p-8 rounded-[2.5rem] bg-bg-main border border-transparent hover:border-primary/20 hover:bg-white transition-all group flex flex-col md:flex-row md:items-center justify-between gap-6">
+                                  <div className="flex-1">
+                                     <div className="flex items-center gap-3 mb-2">
+                                        <span className="px-3 py-1 bg-primary/10 text-primary rounded-lg text-[8px] font-black uppercase tracking-widest">
+                                           {project.category}
+                                        </span>
+                                        <span className="text-[8px] font-black text-text-muted uppercase tracking-widest flex items-center gap-1">
+                                           <Clock size={10} /> {formatRelativeTime(project.createdAt)}
+                                        </span>
+                                     </div>
+                                     <h4 className="text-xl font-black group-hover:text-primary transition-colors">{project.title}</h4>
+                                     <p className="text-xs text-text-muted font-medium mt-2 line-clamp-1">{project.description}</p>
+                                  </div>
+                                  
+                                  <div className="flex items-center gap-8 border-t md:border-t-0 md:border-l border-border pt-6 md:pt-0 md:pl-8">
+                                     <div className="text-right">
+                                        <p className="text-lg font-black">${project.budgetMax}</p>
+                                        <p className="text-[9px] font-black text-text-muted uppercase tracking-widest">{project._count?.bids || 0} Proposals</p>
+                                     </div>
+                                     <button 
+                                       onClick={() => router.push(`/projects/${project.id}`)}
+                                       className="w-14 h-14 bg-white border border-border rounded-2xl flex items-center justify-center text-primary hover:bg-primary hover:text-white transition-all shadow-xl shadow-primary/5"
+                                     >
+                                        <ArrowRightCircle size={20} />
+                                     </button>
+                                  </div>
+                               </div>
+                             ))
+                           ) : (
+                             <div className="py-20 text-center bg-bg-main rounded-[2.5rem] border border-dashed border-border">
+                                <Sparkles size={40} className="text-text-muted mx-auto mb-6 opacity-20" />
+                                <h4 className="text-lg font-black text-text-muted">No projects posted yet</h4>
+                                <button 
+                                  onClick={() => router.push('/projects/create')}
+                                  className="mt-6 text-xs font-black text-primary uppercase tracking-widest hover:underline"
+                                >
+                                   Create your first blueprint
+                                </button>
+                             </div>
+                           )}
+                        </div>
+                     </div>
+                   )}
              </div>
           </div>
         </div>

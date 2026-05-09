@@ -16,4 +16,9 @@ export const projectService = {
     const response = await apiClient.get(`/projects/${id}`);
     return response.data;
   },
+  
+  getMyProjects: async () => {
+    const response = await apiClient.get('/projects/my/all');
+    return response.data;
+  },
 };
