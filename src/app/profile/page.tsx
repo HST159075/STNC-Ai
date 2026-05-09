@@ -108,33 +108,35 @@ export default function ProfilePage() {
       reader.readAsDataURL(file);
 
       try {
-         const formDataFile = new FormData();
-         formDataFile.append('image', file);
+        const formDataFile = new FormData();
+        formDataFile.append('image', file);
 
-         const response = await apiClient.post('/uploads/image', formDataFile);
+        const response = await apiClient.post('/uploads/image', formDataFile, {
+          headers: { 'Content-Type': 'multipart/form-data' },
+        });
 
-         if (response.data.success) {
-            const newImageUrl = response.data.imageUrl;
-            
-            // Update user profile with the new image URL
-            await userService.updateProfile({ 
-               image: newImageUrl,
-               avatarUrl: newImageUrl 
-            });
-            
-            // Update local state for the form
-            setEditForm(prev => ({ ...prev, image: newImageUrl }));
-            
-            // Refresh the session to get updated user data
-            await authClient.getSession();
-            
-            alert("Profile image updated successfully!");
-         }
+        if (response.data.success) {
+          const newImageUrl = response.data.imageUrl;
+
+          // Update user profile with the new image URL
+          await userService.updateProfile({ 
+            image: newImageUrl,
+            avatarUrl: newImageUrl 
+          });
+
+          // Update local state for the form
+          setEditForm(prev => ({ ...prev, image: newImageUrl }));
+
+          // Refresh the session to get updated user data
+          await authClient.getSession();
+
+          alert("Profile image updated successfully!");
+        }
       } catch (error) {
-         console.error("Upload failed:", error);
-         alert("Failed to upload image. Please try again.");
+        console.error("Upload failed:", error);
+        alert("Failed to upload image. Please try again.");
       } finally {
-         setUploading(false);
+        setUploading(false);
       }
     };
     const handleDeleteProject = async (projectId: string) => {
