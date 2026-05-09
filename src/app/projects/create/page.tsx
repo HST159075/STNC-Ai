@@ -106,7 +106,6 @@ const CreateProjectPage = () => {
     try {
       const response = await projectService.createProject({
         ...formData,
-        clientId: (session.user as any).id,
         tags: formData.tags.split(',').map(tag => tag.trim()),
       });
 
