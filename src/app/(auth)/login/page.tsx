@@ -81,7 +81,7 @@ export default function LoginPage() {
     try {
       await signIn.social({
         provider,
-        callbackURL: "/dashboard",
+        callbackURL: `${window.location.origin}/dashboard`,
       });
     } catch (err: any) {
       setError(`${provider} login failed`);

@@ -47,7 +47,7 @@ export default function RegisterPage() {
     try {
       await signIn.social({
         provider,
-        callbackURL: "/dashboard",
+        callbackURL: `${window.location.origin}/dashboard`,
       });
     } catch (err: any) {
       setError(`${provider} signup failed`);
