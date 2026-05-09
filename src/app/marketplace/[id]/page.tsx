@@ -9,13 +9,22 @@ import {
   Star, MapPin, Globe, Code, 
   Briefcase, CheckCircle2, Zap, 
   MessageSquare, ArrowLeft, Layers,
-  ExternalLink, Calendar
+  ExternalLink, Calendar, Loader2, X
 } from "lucide-react";
 import Link from "next/link";
+import { useSession } from "@/lib/auth-client";
+import { projectService } from "@/services/projectService";
+import { toast } from "sonner";
 
 export default function FreelancerDetailsPage() {
   const { id } = useParams();
   const router = useRouter();
+  const { data: session } = useSession();
+  
+  const [isHireModalOpen, setIsHireModalOpen] = useState(false);
+  const [myProjects, setMyProjects] = useState<any[]>([]);
+  const [loadingProjects, setLoadingProjects] = useState(false);
+  const [hiringLoader, setHiringLoader] = useState<string | null>(null);
 
   const { data, isLoading } = useQuery({
     queryKey: ['freelancer', id],
@@ -25,6 +34,51 @@ export default function FreelancerDetailsPage() {
     },
     enabled: !!id
   });
+
+  const handleHireClick = async () => {
+    if (!session) {
+      router.push("/login");
+      return;
+    }
+    
+    if ((session.user as any).role !== "CLIENT" && (session.user as any).role !== "SUPER_ADMIN") {
+      toast.error("Only clients can hire architects.");
+      return;
+    }
+
+    setIsHireModalOpen(true);
+    setLoadingProjects(true);
+    try {
+      const res = await projectService.getMyProjects();
+      setMyProjects(res.projects.filter((p: any) => p.status === "OPEN"));
+    } catch (error) {
+      console.error("Failed to fetch projects:", error);
+    } finally {
+      setLoadingProjects(false);
+    }
+  };
+
+  const handleConfirmHire = async (projectId: string, amount: number) => {
+    setHiringLoader(projectId);
+    try {
+      const res = await apiClient.post("/contracts", {
+        agreedAmount: amount,
+        projectId,
+        freelancerId: id,
+        clientId: (session?.user as any).id
+      });
+
+      if (res.data.success) {
+        toast.success("Strategic partnership established!");
+        setIsHireModalOpen(false);
+        router.push("/dashboard");
+      }
+    } catch (error) {
+      toast.error("Hiring protocol failed. Please try again.");
+    } finally {
+      setHiringLoader(null);
+    }
+  };
 
   if (isLoading) return (
     <div className="min-h-screen bg-bg-main flex items-center justify-center">
@@ -42,6 +96,61 @@ export default function FreelancerDetailsPage() {
   return (
     <div className="min-h-screen bg-bg-main pb-20">
       <Navbar />
+
+      {/* Hire Modal */}
+      <AnimatePresence>
+        {isHireModalOpen && (
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-6">
+             <motion.div 
+               initial={{ opacity: 0 }}
+               animate={{ opacity: 1 }}
+               exit={{ opacity: 0 }}
+               onClick={() => setIsHireModalOpen(false)}
+               className="absolute inset-0 bg-black/60 backdrop-blur-md"
+             />
+             <motion.div 
+               initial={{ scale: 0.9, opacity: 0, y: 20 }}
+               animate={{ scale: 1, opacity: 1, y: 0 }}
+               exit={{ scale: 0.9, opacity: 0, y: 20 }}
+               className="bg-bg-card border border-border w-full max-w-2xl rounded-[3rem] p-12 relative z-10 shadow-2xl"
+             >
+                <button onClick={() => setIsHireModalOpen(false)} className="absolute top-8 right-8 p-3 hover:bg-bg-main rounded-2xl transition-all">
+                   <X size={24} />
+                </button>
+                
+                <h2 className="text-3xl font-black mb-2">Hire <span className="text-primary italic">{data.name}</span></h2>
+                <p className="text-text-muted font-medium mb-10">Select a project blueprint to initiate this strategic partnership.</p>
+
+                <div className="space-y-4 max-h-[400px] overflow-y-auto pr-4">
+                   {loadingProjects ? (
+                      <div className="py-20 text-center"><Loader2 className="animate-spin mx-auto text-primary" size={32} /></div>
+                   ) : myProjects.length > 0 ? (
+                      myProjects.map((project) => (
+                         <div key={project.id} className="p-6 bg-bg-main border border-border rounded-[2rem] flex items-center justify-between group hover:border-primary/40 transition-all">
+                            <div>
+                               <h4 className="text-lg font-black group-hover:text-primary transition-colors">{project.title}</h4>
+                               <p className="text-xs text-text-muted font-bold mt-1">Budget: ${project.budgetMin} - ${project.budgetMax}</p>
+                            </div>
+                            <button 
+                              onClick={() => handleConfirmHire(project.id, project.budgetMin)}
+                              disabled={!!hiringLoader}
+                              className="px-6 py-3 bg-primary text-white rounded-xl font-black text-[10px] uppercase tracking-widest flex items-center gap-2 hover:scale-105 transition-all disabled:opacity-50"
+                            >
+                               {hiringLoader === project.id ? <Loader2 size={14} className="animate-spin" /> : "Initiate"}
+                            </button>
+                         </div>
+                      ))
+                   ) : (
+                      <div className="text-center py-12 bg-bg-main/50 border-2 border-dashed border-border rounded-[2rem]">
+                         <p className="text-sm text-text-muted font-black uppercase tracking-widest mb-4">No active project blueprints found</p>
+                         <Link href="/projects/post" className="btn-primary py-3 text-[10px]">Create New Project</Link>
+                      </div>
+                   )}
+                </div>
+             </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
 
       {/* Hero Header */}
       <section className="pt-32 pb-20 bg-bg-card border-b border-border">
@@ -70,7 +179,12 @@ export default function FreelancerDetailsPage() {
                         <p className="text-xl text-primary font-black uppercase tracking-widest">{data.serviceType || "Strategic Architect"}</p>
                      </div>
                      <div className="flex gap-4">
-                        <button className="btn-primary px-10 py-5 text-lg">Hire Architect</button>
+                        <button 
+                          onClick={handleHireClick}
+                          className="btn-primary px-10 py-5 text-lg"
+                        >
+                           Hire Architect
+                        </button>
                         <button className="p-5 bg-bg-main border border-border rounded-2xl text-text-muted hover:text-primary transition-all">
                            <MessageSquare size={24} />
                         </button>
