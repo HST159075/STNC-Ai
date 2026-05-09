@@ -48,7 +48,7 @@ export default function AdminManagementPage() {
         status
       });
       if (data.success) {
-        setProjects(data.projects);
+        setProjects(data.projects || []);
         setPagination(prev => ({
           ...prev,
           totalPages: data.pagination.totalPages,

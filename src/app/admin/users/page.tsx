@@ -30,7 +30,7 @@ export default function AdminUsersPage() {
   const fetchUsers = async () => {
     try {
       const data = await adminService.getUsers();
-      if (data.success) setUsers(data.users);
+      if (data.success) setUsers(data.users || []);
     } catch (error) {
       console.error("Failed to fetch users:", error);
     } finally {
