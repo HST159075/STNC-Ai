@@ -6,7 +6,7 @@ import {
   Briefcase, Calendar, ShieldCheck, 
   Zap, Edit3, Sparkles, ArrowRight,
   Star, Award, CheckCircle2, Layout,
-  Settings, LogOut, Trophy
+  Settings, LogOut, Trophy, Clock, ArrowRightCircle
 } from "lucide-react";
 import Navbar from "@/components/layout/Navbar";
 import Sidebar from "@/components/layout/Sidebar";
