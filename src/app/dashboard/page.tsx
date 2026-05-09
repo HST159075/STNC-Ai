@@ -96,8 +96,12 @@ export default function DashboardPage() {
                 <Bell size={20} />
                 <span className="absolute top-3 right-3 w-2 h-2 bg-primary rounded-full" />
              </button>
-             <div className="w-12 h-12 rounded-2xl bg-primary flex items-center justify-center text-white font-black">
-                {user?.name?.[0]}
+             <div className="w-12 h-12 rounded-2xl bg-primary flex items-center justify-center text-white font-black overflow-hidden border border-border">
+                {user?.image ? (
+                   <img src={user.image} alt="Profile" className="w-full h-full object-cover" />
+                ) : (
+                   user?.name?.[0]
+                )}
              </div>
           </div>
         </header>
