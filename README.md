@@ -1,17 +1,17 @@
-# 🚀 NexusMarket - AI-Powered Freelance Ecosystem
+#  Nexus - AI-Powered Freelance Ecosystem
 
-NexusMarket is a production-ready, AI-driven freelance marketplace designed to intelligently connect elite developers with top-tier client projects. It features robust role-based access, real-time messaging, secure authentication, and a suite of advanced Artificial Intelligence tools to automate and optimize the freelancing workflow.
+Nexus is a production-ready, AI-driven freelance marketplace designed to intelligently connect elite developers with top-tier client projects. It features robust role-based access, real-time messaging, secure authentication, and a suite of advanced Artificial Intelligence tools to automate and optimize the freelancing workflow.
 
 ---
 
-## 📖 Project Overview
-NexusMarket solves the traditional problems of freelance platforms (spam bids, poorly written proposals, and unmatched skills) by integrating Deep AI at every step. From auditing proposals to generating strategic cover letters and providing real-time data insights, the platform ensures high-quality interactions between Clients and Freelancers. 
+##  Project Overview
+Nexus solves the traditional problems of freelance platforms (spam bids, poorly written proposals, and unmatched skills) by integrating Deep AI at every step. From auditing proposals to generating strategic cover letters and providing real-time data insights, the platform ensures high-quality interactions between Clients and Freelancers. 
 
 This project was built focusing on **Performance**, **Scalability**, **UX/UI Best Practices**, and **Advanced System Architecture**.
 
 ---
 
-## 💻 Tech Stack
+##  Tech Stack:
 
 ### Frontend Architecture
 * **Framework:** Next.js 14+ (App Router) with TypeScript
@@ -20,7 +20,7 @@ This project was built focusing on **Performance**, **Scalability**, **UX/UI Bes
 * **Forms & Validation:** React Hook Form + Zod
 * **Real-time:** Socket.io-client
 
-### Backend Architecture
+### Backend Architecture:
 * **Runtime & Framework:** Node.js, Express, TypeScript
 * **Database & ORM:** PostgreSQL + Prisma ORM
 * **Authentication:** Better-Auth (Role-based: Client, Freelancer, Admin)
@@ -34,9 +34,9 @@ This project was built focusing on **Performance**, **Scalability**, **UX/UI Bes
 
 ---
 
-## 🤖 Core AI Features
+##  Core AI Features:
 
-NexusMarket integrates 6 highly practical, real-API AI features:
+Nexus integrates 6 highly practical, real-API AI features:
 
 1. **AI Bid Auditor (Data Analyzer):** 
    * *How it works:* Clients can audit all submitted bids for a project with one click. The AI ranks freelancers based on their skills, cover letter, and project requirements, providing a "Top Pick" and strategic hiring advice.
@@ -53,7 +53,7 @@ NexusMarket integrates 6 highly practical, real-API AI features:
 
 ---
 
-## ⚙️ Advanced Engineering Implementations
+##  Advanced Engineering Implementations:
 
 * **Optimistic UI:** Used during proposal submissions and state changes to provide instant UI feedback before server confirmation.
 * **Real-Time Data Streams:** Integrated Socket.io for instant messaging and live notification updates.
@@ -64,17 +64,17 @@ NexusMarket integrates 6 highly practical, real-API AI features:
 
 ---
 
-## 🛠️ Setup Instructions
+##  Setup Instructions:
 
 ### Prerequisites
-- Node.js (v18+)
+- Node.js 
 - PostgreSQL Database
-- Redis Server (Optional but recommended)
+- Redis Server 
 - API Keys: Groq/Gemini, Cloudinary
 
 ### 1. Clone the repository
 ```bash
-git clone https://github.com/yourusername/STNC-Ai.git
+git clone https://github.com/HST159075/STNC-Ai.git
 cd STNC-Ai
 ```
 
@@ -109,10 +109,13 @@ npm run dev
 ```
 
 ### 4. Default Demo Credentials
-* **Client Account:** `demo@client.com` / `password123`
-* **Freelancer Account:** `demo@freelancer.com` / `password123`
-* **Admin Account:** `admin@nexus.com` / `admin123`
+* **Client Account:** `demo@client.com` | `password123`
+* **Freelancer Account:** `demo@freelancer.com` | `password123`
+* **Admin Account:** `admin@nexus.com` | `admin123`
 
----
-
-> Built with ❤️ for the AI-Driven Full Stack Project Contest.
+<h2>contect me</h2>
+<br>
+<h3>
+email: hsttasin90@gmail.com
+linkdin: https://www.linkedin.com/in/md-tasinul-alam-28158735a/?skipRedirect=true
+</h3>
