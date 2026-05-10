@@ -113,9 +113,10 @@ npm run dev
 * **Freelancer Account:** `demo@freelancer.com` | `password123`
 * **Admin Account:** `admin@nexus.com` | `admin123`
 
-<h2>contect me</h2>
+<h2>Contect me:</h2>
 <br>
 <h3>
-email: hsttasin90@gmail.com
-linkdin: https://www.linkedin.com/in/md-tasinul-alam-28158735a/?skipRedirect=true
+Email: hsttasin90@gmail.com
+ <br>
+Linkdin: https://www.linkedin.com/in/md-tasinul-alam-28158735a/?skipRedirect=true
 </h3>
