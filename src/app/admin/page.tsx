@@ -91,8 +91,8 @@ export default function AdminDashboard() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
           {[
             { label: "Total Revenue", value: "$124,500", icon: TrendingUp, color: "text-emerald-500" },
-            { label: "Platform Users", value: stats?.stats.userCount || 0, icon: Users, color: "text-blue-500" },
-            { label: "Active Bids", value: stats?.stats.bidCount || 0, icon: Sparkles, color: "text-purple-500" },
+            { label: "Platform Users", value: stats?.stats?.userCount || 0, icon: Users, color: "text-blue-500" },
+            { label: "Active Bids", value: stats?.stats?.bidCount || 0, icon: Sparkles, color: "text-purple-500" },
             { label: "Success Rate", value: "98.2%", icon: Activity, color: "text-amber-500" },
           ].map((stat, i) => (
             <motion.div
@@ -233,7 +233,7 @@ export default function AdminDashboard() {
                       </tr>
                    </thead>
                    <tbody className="text-sm font-medium">
-                      {stats?.recentProjects.map((p: any) => (
+                      {stats?.stats?.recentProjects?.map((p: any) => (
                         <tr key={p.id} className="border-b border-border/50 hover:bg-bg-main transition-all group">
                            <td className="py-4">
                               <div className="font-bold">{p.title}</div>
