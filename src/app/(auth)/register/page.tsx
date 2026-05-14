@@ -45,10 +45,11 @@ export default function RegisterPage() {
     setLoading(true);
     setError("");
     try {
-      await signIn.social({
-        provider,
-        callbackURL: `${window.location.origin}/dashboard`,
-      });
+      const backendUrl = process.env.NEXT_PUBLIC_AUTH_URL || "https://stns-ai-1eeo.onrender.com";
+      const callbackUrl = `${window.location.origin}/dashboard`;
+      
+      // Direct navigation to the backend avoids third-party cookie blocking issues
+      window.location.href = `${backendUrl}/api/auth/login/social/${provider}?callbackURL=${callbackUrl}`;
     } catch (err: any) {
       setError(`${provider} signup failed`);
       setLoading(false);
