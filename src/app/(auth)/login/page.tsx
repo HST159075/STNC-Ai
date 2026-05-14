@@ -82,8 +82,8 @@ export default function LoginPage() {
       const backendUrl = process.env.NEXT_PUBLIC_AUTH_URL || "https://stns-ai-1eeo.onrender.com";
       const callbackUrl = `${window.location.origin}/dashboard`;
       
-      // Direct navigation to the backend avoids third-party cookie blocking issues
-      window.location.href = `${backendUrl}/api/auth/login/social/${provider}?callbackURL=${callbackUrl}`;
+      // Correct Better Auth social login endpoint using query parameter
+      window.location.href = `${backendUrl}/api/auth/login/social?provider=${provider}&callbackURL=${callbackUrl}`;
     } catch (err: any) {
       setError(`${provider} login failed`);
       setLoading(false);
