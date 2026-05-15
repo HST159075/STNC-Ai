@@ -7,4 +7,6 @@ services:
     startCommand: npm start
     envVars:
       - key: NEXT_PUBLIC_API_URL
-        value: https://stns-ai.onrender.com/api
+        value: https://stns-ai-1eeo.onrender.com/api
+      - key: NEXT_PUBLIC_AUTH_URL
+        value: https://stns-ai-1eeo.onrender.com
