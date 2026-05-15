@@ -79,9 +79,10 @@ export default function LoginPage() {
     setLoading(true);
     setError("");
     try {
+      const frontendUrl = process.env.NEXT_PUBLIC_APP_URL || window.location.origin;
       await signIn.social({
         provider,
-        callbackURL: "/dashboard",
+        callbackURL: `${frontendUrl}/dashboard`,
       });
     } catch (err: any) {
       setError(`${provider} login failed`);
