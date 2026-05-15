@@ -79,11 +79,10 @@ export default function LoginPage() {
     setLoading(true);
     setError("");
     try {
-      const backendUrl = process.env.NEXT_PUBLIC_AUTH_URL || "https://stns-ai-1eeo.onrender.com";
-      const callbackUrl = `${window.location.origin}/dashboard`;
-      
-      // Correct Better Auth social login endpoint using query parameter
-      window.location.href = `${backendUrl}/api/auth/login/social?provider=${provider}&callbackURL=${callbackUrl}`;
+      await signIn.social({
+        provider,
+        callbackURL: "/dashboard",
+      });
     } catch (err: any) {
       setError(`${provider} login failed`);
       setLoading(false);
