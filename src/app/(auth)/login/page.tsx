@@ -75,19 +75,10 @@ export default function LoginPage() {
     }
   };
 
-   const handleSocialLogin = async (provider: 'google' | 'github') => {
-    setLoading(true);
-    setError("");
-    try {
-      const frontendUrl = process.env.NEXT_PUBLIC_APP_URL || window.location.origin;
-      await signIn.social({
-        provider,
-        callbackURL: `${frontendUrl}/dashboard`,
-      });
-    } catch (err: any) {
-      setError(`${provider} login failed`);
-      setLoading(false);
-    }
+   const handleSocialLogin = (provider: 'google' | 'github') => {
+    const backendUrl = process.env.NEXT_PUBLIC_AUTH_URL || "https://stns-ai-1eeo.onrender.com";
+    const callbackURL = `${window.location.origin}/dashboard`;
+    window.location.href = `${backendUrl}/api/auth/sign-in/social?provider=${provider}&callbackURL=${encodeURIComponent(callbackURL)}`;
   };
 
   return (
