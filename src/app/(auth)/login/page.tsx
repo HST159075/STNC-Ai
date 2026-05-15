@@ -75,10 +75,19 @@ export default function LoginPage() {
     }
   };
 
-   const handleSocialLogin = (provider: 'google' | 'github') => {
-    const backendUrl = process.env.NEXT_PUBLIC_AUTH_URL || "https://stns-ai-1eeo.onrender.com";
-    const callbackURL = `${window.location.origin}/dashboard`;
-    window.location.href = `${backendUrl}/api/auth/sign-in/social?provider=${provider}&callbackURL=${encodeURIComponent(callbackURL)}`;
+   const handleSocialLogin = async (provider: 'google' | 'github') => {
+    setLoading(true);
+    setError("");
+    try {
+      await signIn.social({
+        provider,
+        callbackURL: "https://nexus-ai-mo5u.onrender.com/dashboard",
+        errorCallbackURL: "https://nexus-ai-mo5u.onrender.com/login?error=oauth",
+      });
+    } catch (err: any) {
+      setError(`${provider} login failed. Please try again.`);
+      setLoading(false);
+    }
   };
 
   return (
