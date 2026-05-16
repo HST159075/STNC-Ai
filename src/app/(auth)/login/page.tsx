@@ -75,6 +75,7 @@ export default function LoginPage() {
     }
   };
 
+   // ✅ Uses Better Auth signIn.social() — POST method, not GET redirect
    const handleSocialLogin = async (provider: 'google' | 'github') => {
     setLoading(true);
     setError("");
